@@ -302,7 +302,7 @@ document.getElementById("btn-calc").addEventListener("click",function(){
   document.getElementById("result-section").style.display="block";
   window.scrollTo({top:0,behavior:"smooth"});
   var _payload={nome:nome,email:document.getElementById("lead-email").value.trim(),time:teamName,pessoas:nPessoas,horas_semana:horasSemana,horas_atrito:horasAtrito,score_comunicacao:scores["comunicacao"],score_processo:scores["processo"],score_decisao:scores["decisao"],score_relacional:scores["relacional"],score_operacional:scores["operacional"],friccao_total_pct:pct,nivel_alerta:nivel.label,data:new Date().toISOString()};
-  fetch("https://hook.us2.make.com/npmx5r1kjlnvjt1lrlc1kyvm2zsgrt01",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_payload),mode:"no-cors"}).catch(function(){});
+  fetch("https://hook.us2.make.com/j44dlsdlxbpnq9eob69ftu1q18tx92dy",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_payload),mode:"no-cors"}).catch(function(){});
 });
 document.getElementById("btn-ref").addEventListener("click",function(){
   document.getElementById("result-section").style.display="none";
