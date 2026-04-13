@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico de Atrito Operacional</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f5f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a1a}
+.wrap{max-width:640px;margin:0 auto;padding:2rem 1rem;font-family:inherit}
+.page-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:2px solid #0C447C}
+.page-header h1{font-size:22px;font-weight:500;color:#0C447C;margin-bottom:6px;letter-spacing:-0.3px}
+.page-header p{font-size:14px;color:#5F5E5A;line-height:1.6}
+.card{background:#fff;border:0.5px solid rgba(0,0,0,0.1);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem}
+.card-lead{background:#E6F1FB;border:none;border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.card-lead-title{font-size:15px;font-weight:500;color:#0C447C;margin-bottom:4px}
+.card-lead-sub{font-size:13px;color:#185FA5;margin-bottom:16px;line-height:1.5}
+.card-title{font-size:12px;font-weight:500;color:#185FA5;margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.6px}
+.field-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.field-row-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;color:#185FA5;font-weight:500}
+.field label span{color:#E24B4A}
+.finput{width:100%;padding:9px 12px;font-size:14px;border:1px solid #B5D4F4;border-radius:8px;background:#fff;color:#1a1a1a;outline:none;font-family:inherit}
+.finput:focus{border-color:#0C447C;box-shadow:0 0 0 3px rgba(12,68,124,0.08)}
+.finput-lead{width:100%;padding:10px 12px;font-size:14px;border:1px solid #85B7EB;border-radius:8px;background:#fff;color:#042C53;outline:none;font-family:inherit}
+.finput-lead:focus{border-color:#0C447C;box-shadow:0 0 0 3px rgba(12,68,124,0.12)}
+.finput-lead::placeholder{color:#85B7EB}
+.cat-block{margin-bottom:1.5rem}
+.cat-block:last-child{margin-bottom:0}
+.cat-name{font-size:14px;font-weight:500;color:#1a1a1a;margin-bottom:3px}
+.cat-desc{font-size:12px;color:#5F5E5A;margin-bottom:10px;line-height:1.5}
+.scale-row{display:flex;gap:4px}
+.sbtn{width:34px;height:36px;border-radius:6px;border:1px solid #B5D4F4;background:#fff;color:#185FA5;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.1s;user-select:none;font-weight:500}
+.sbtn:hover{border-color:#0C447C;background:#E6F1FB;color:#0C447C}
+.scale-labels{display:flex;justify-content:space-between;margin-top:5px}
+.scale-labels span{font-size:11px;color:#5F5E5A}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.badge{font-size:11px;padding:4px 10px;border-radius:6px;font-weight:500}
+.b-g{background:#EAF3DE;color:#27500A}
+.b-a{background:#FAEEDA;color:#633806}
+.b-c{background:#FAEEDA;color:#854F0B}
+.b-r{background:#FCEBEB;color:#791F1F}
+.slider-wrap{display:flex;align-items:center;gap:12px;margin-top:8px}
+.slider-wrap input[type=range]{flex:1;cursor:pointer;accent-color:#185FA5}
+.slider-val{font-size:16px;font-weight:500;color:#0C447C;min-width:36px;text-align:right}
+.slider-lbl{font-size:12px;color:#5F5E5A;margin-top:5px}
+.btn-main{width:100%;padding:14px;background:#0C447C;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;margin-top:0.5rem;font-family:inherit;letter-spacing:0.2px}
+.btn-main:hover{background:#185FA5}
+.val-msg{font-size:12px;color:#A32D2D;margin-top:8px;display:none;padding:8px 12px;background:#FCEBEB;border-radius:6px}
+.result-section{display:none;margin-top:1.5rem}
+.r-header{background:#042C53;border-radius:12px;padding:2rem 1.5rem;text-align:center;margin-bottom:1rem}
+.r-team{font-size:13px;color:#85B7EB;margin-bottom:8px;letter-spacing:0.3px}
+.r-pct{font-size:72px;font-weight:500;line-height:1;color:#fff}
+.r-badge{display:inline-block;padding:5px 18px;border-radius:6px;font-size:13px;font-weight:500;margin-top:12px}
+.meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:1rem}
+.mc{background:#E6F1FB;border-radius:10px;padding:1rem 1.25rem}
+.mc .ml{font-size:11px;color:#185FA5;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;font-weight:500}
+.mc .mv{font-size:20px;font-weight:500;color:#042C53}
+.sp-bar{position:relative;height:10px;margin:10px 0 8px}
+.sp-track{height:10px;border-radius:6px;background:linear-gradient(to right,#639922,#EF9F27,#D85A30,#A32D2D)}
+.sp-marker{position:absolute;top:-5px;width:20px;height:20px;border-radius:50%;background:#fff;border:2.5px solid #0C447C;transform:translateX(-50%);transition:left 0.4s}
+.sp-ticks{display:flex;justify-content:space-between;font-size:11px;color:#5F5E5A;margin-bottom:10px}
+.lvl-leg{display:flex;gap:12px;flex-wrap:wrap}
+.lvl-item{display:flex;align-items:center;gap:5px;font-size:12px;color:#5F5E5A}
+.ldot{width:8px;height:8px;border-radius:50%}
+.cr-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.crn{font-size:13px;color:#1a1a1a;width:100px;flex-shrink:0;font-weight:500}
+.crb{flex:1;height:6px;border-radius:4px;background:#E6F1FB;overflow:hidden}
+.crb-fill{height:100%;border-radius:4px}
+.crs{font-size:13px;font-weight:500;width:18px;text-align:right;flex-shrink:0}
+.crit-pill{font-size:11px;padding:2px 8px;border-radius:6px;background:#FCEBEB;color:#791F1F;flex-shrink:0;font-weight:500}
+.h-note{font-size:12px;color:#5F5E5A;margin-top:14px;padding-top:12px;border-top:0.5px solid rgba(0,0,0,0.08);line-height:1.6}
+.h-note strong{color:#0C447C;font-weight:500}
+.dim-block{margin-bottom:1rem;padding-bottom:1rem;border-bottom:0.5px solid rgba(0,0,0,0.08)}
+.dim-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.dim-header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.dim-rank{font-size:11px;color:#185FA5;width:20px;flex-shrink:0;font-weight:500}
+.dim-name{font-size:14px;font-weight:500;color:#1a1a1a;flex:1}
+.dim-score{font-size:13px;font-weight:500}
+.dim-text{font-size:13px;color:#5F5E5A;line-height:1.6;margin-left:30px}
+.reveal-block{margin-bottom:1rem}
+.reveal-block:last-child{margin-bottom:0}
+.reveal-title{font-size:13px;font-weight:500;color:#0C447C;margin-bottom:6px}
+.reveal-text{font-size:13px;color:#5F5E5A;line-height:1.7}
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;text-decoration:none;font-family:inherit}
+.wa-btn:hover{opacity:0.88}
+.wa-icon{width:20px;height:20px;fill:#fff;flex-shrink:0}
+.lgpd-note{font-size:11px;color:#888780;line-height:1.6;margin-top:12px;text-align:center;padding:0 8px}
+.btn-ref{width:100%;padding:10px;background:transparent;border:1px solid #B5D4F4;border-radius:10px;font-size:13px;color:#185FA5;cursor:pointer;margin-top:1rem;font-family:inherit;font-weight:500}
+.btn-ref:hover{background:#E6F1FB}
+.radar-wrap{display:flex;justify-content:center;margin:8px 0 4px}
+.card-section-title{font-size:12px;font-weight:500;color:#185FA5;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="form-section">
+    <div class="page-header">
+      <h1>Diagnóstico de atrito operacional</h1>
+      <p>Responda as perguntas abaixo com base na sua percepção sobre o time. O resultado é gerado ao final.</p>
+    </div>
+
+    <div class="card-lead">
+      <div class="card-lead-title">Antes de começar</div>
+      <div class="card-lead-sub">Preencha seus dados para receber o resultado e, se quiser, conversar sobre ele.</div>
+      <div class="field-row-2">
+        <div class="field"><label>Nome <span>*</span></label><input class="finput-lead" type="text" id="lead-nome" placeholder="Seu nome completo"></div>
+        <div class="field"><label>E-mail <span>*</span></label><input class="finput-lead" type="email" id="lead-email" placeholder="seu@email.com"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Dados do time</div>
+      <div class="field-row">
+        <div class="field"><label>Nome do time</label><input class="finput" type="text" id="team-name" placeholder="ex: Marketing"></div>
+        <div class="field"><label>Pessoas no time</label><input class="finput" type="number" id="n-pessoas" min="1" max="500" placeholder="ex: 6"></div>
+        <div class="field"><label>Horas semanais / pessoa</label><input class="finput" type="number" id="horas-semana" min="1" max="80" placeholder="ex: 40"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Horas em atrito por semana</div>
+      <p style="font-size:13px;color:#5F5E5A;margin-bottom:12px;line-height:1.6">Estime quantas horas por semana o time perde com reuniões improdutivas, interrupções e processos ineficientes.</p>
+      <div class="slider-wrap">
+        <input type="range" id="horas-atrito" min="0" max="80" value="0" step="1">
+        <span class="slider-val" id="horas-atrito-val">0h</span>
+      </div>
+      <div class="slider-lbl">0 — nenhuma perda &nbsp;·&nbsp; 80h — semana inteira</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Avaliação por categoria</div>
+      <p style="font-size:13px;color:#5F5E5A;margin-bottom:14px;line-height:1.6">Para cada categoria, selecione o número que melhor representa o nível de atrito percebido no time.</p>
+      <div class="badge-row">
+        <span class="badge b-g">0–2 Saudável</span>
+        <span class="badge b-a">3–4 Atenção</span>
+        <span class="badge b-c">5–6 Moderado</span>
+        <span class="badge b-r">7–10 Crítico</span>
+      </div>
+      <div id="categorias"></div>
+    </div>
+
+    <div class="val-msg" id="val-msg">Preencha todos os campos obrigatórios e selecione uma nota para cada categoria antes de continuar.</div>
+    <button class="btn-main" id="btn-calc">Ver diagnóstico</button>
+  </div>
+
+  <div class="result-section" id="result-section">
+    <div class="r-header">
+      <div class="r-team" id="r-team">Diagnóstico · —</div>
+      <div class="r-pct" id="r-pct">—%</div>
+      <div><span class="r-badge" id="r-badge">—</span></div>
+    </div>
+    <div class="meta-grid">
+      <div class="mc"><div class="ml">Capacidade semanal</div><div class="mv" id="r-cap">—</div></div>
+      <div class="mc"><div class="ml">Horas em atrito</div><div class="mv" id="r-hatrito">—</div></div>
+      <div class="mc"><div class="ml">Pessoas no time</div><div class="mv" id="r-pessoas">—</div></div>
+    </div>
+    <div class="card">
+      <div class="card-section-title">Espectro de atrito operacional</div>
+      <div class="sp-bar"><div class="sp-track"></div><div class="sp-marker" id="r-marker" style="left:0%"></div></div>
+      <div class="sp-ticks"><span>0%</span><span>25%</span><span>45%</span><span>65%</span><span>100%</span></div>
+      <div class="lvl-leg">
+        <div class="lvl-item"><span class="ldot" style="background:#639922"></span>Saudável (0–25%)</div>
+        <div class="lvl-item"><span class="ldot" style="background:#EF9F27"></span>Atenção (26–45%)</div>
+        <div class="lvl-item"><span class="ldot" style="background:#D85A30"></span>Moderado (46–65%)</div>
+        <div class="lvl-item"><span class="ldot" style="background:#A32D2D"></span>Crítico (66–100%)</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-section-title">Avaliação por categoria</div>
+      <div id="r-cats"></div>
+      <div class="h-note" id="r-hnote"></div>
+    </div>
+    <div class="card">
+      <div class="card-section-title">Radar das dimensões</div>
+      <div class="radar-wrap"><canvas id="radarChart" width="300" height="300"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-section-title">Leitura por dimensão — da mais crítica à mais saudável</div>
+      <div id="r-dims"></div>
+    </div>
+    <div class="card">
+      <div class="card-section-title">O que este diagnóstico revela</div>
+      <div class="reveal-block">
+        <div class="reveal-title">Por que isso importa</div>
+        <div class="reveal-text">Atrito operacional não é apenas perda de tempo. É energia do time sendo consumida no lugar errado. Cada hora perdida em reunião sem pauta, decisão travada ou processo confuso é uma hora que não foi para o que realmente importa.</div>
+      </div>
+      <div style="height:1px;background:rgba(0,0,0,0.08);margin:1rem 0"></div>
+      <div class="reveal-block">
+        <div class="reveal-title">Uma distinção importante</div>
+        <div class="reveal-text">Este diagnóstico mede percepção, não realidade objetiva. O que o gestor sente sobre o time é um dado valioso, mas pode divergir do que os membros do time sentem. Use este resultado como ponto de partida para uma conversa, não como veredicto.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;color:#5F5E5A;margin-bottom:14px">Quer conversar sobre os resultados?</div>
+      <a class="wa-btn" id="wa-link" href="#" target="_blank">
+        <svg class="wa-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Falar pelo WhatsApp
+      </a>
+      <div class="lgpd-note">As informações fornecidas neste formulário, incluindo nome e e-mail, são utilizadas exclusivamente para contato relacionado ao diagnóstico realizado. Seus dados não são compartilhados com terceiros. Em conformidade com a LGPD, você pode solicitar a exclusão dos seus dados a qualquer momento pelo mesmo WhatsApp ou pelo e-mail de contato.</div>
+    </div>
+    <button class="btn-ref" id="btn-ref">Refazer diagnóstico</button>
+  </div>
+</div>
+
+<script>
+var CATS=[
+  {id:"comunicacao",name:"Comunicação",desc:"Clareza, fluxo e eficácia da comunicação interna do time."},
+  {id:"processo",name:"Processo",desc:"Qualidade e fluidez dos processos de trabalho."},
+  {id:"decisao",name:"Decisão",desc:"Agilidade e clareza nos processos decisórios."},
+  {id:"relacional",name:"Relacional",desc:"Qualidade das relações interpessoais e colaboração."},
+  {id:"operacional",name:"Operacional",desc:"Interrupções, ferramentas e ambiente de trabalho."}
+];
+var DIM_TEXTS={
+  comunicacao:["A percepção registrada sugere que a comunicação tende a fluir bem. As informações possivelmente circulam com clareza e o time parece alinhado.","O padrão observado aponta para possíveis ruídos pontuais na comunicação. Pode valer identificar onde as mensagens se perdem ou chegam com atraso.","O nível registrado indica possível atrito visível na comunicação. Retrabalho, mal-entendidos ou falta de alinhamento podem estar ocorrendo com frequência.","A avaliação aponta possível falta de clareza, direção ou canais funcionais na comunicação do time."],
+  processo:["A percepção registrada sugere que os processos tendem a ser claros e fluidos. O trabalho possivelmente avança sem burocracia desnecessária.","O padrão observado indica possíveis gargalos pontuais nos processos. Alguns fluxos podem estar pedindo mais agilidade ou definição.","O nível registrado aponta possível atrito considerável nos processos. Etapas desnecessárias, retrabalho ou falta de padrão podem ser recorrentes.","A avaliação indica possível falta de fluxo claro nos processos. O trabalho pode estar travando com frequência por ausência de definições."],
+  decisao:["A percepção registrada sugere que as decisões tendem a acontecer com agilidade. O time possivelmente sabe quem decide o quê e quando.","O padrão observado aponta que algumas decisões podem demorar ou ficar em aberto. Tornar o processo decisório mais claro pode ajudar.","O nível registrado indica possível impacto de decisões travadas ou lentas no ritmo do time. Pode faltar clareza sobre papéis e critérios decisórios.","A avaliação aponta possível falha estrutural no processo decisório. Decisões podem estar atrasando, voltando ou não chegando a acontecer."],
+  relacional:["A percepção registrada sugere que o clima relacional tende a ser saudável. Confiança, colaboração e respeito possivelmente estão presentes.","O padrão observado indica possíveis tensões pontuais nas relações. Vale atenção para que não se tornem padrão no time.","O nível registrado aponta possível desgaste no ambiente relacional. Conflitos, falta de confiança ou colaboração fragmentada podem ser frequentes.","A avaliação indica possível impacto crítico das relações no funcionamento do time. O clima pode estar prejudicando a entrega e o bem-estar das pessoas."],
+  operacional:["A percepção registrada sugere que o ambiente operacional tende a ser favorável. Ferramentas e rotinas possivelmente apoiam a concentração.","O padrão observado aponta possíveis interrupções ou limitações operacionais pontuais que merecem atenção.","O nível registrado indica possível fragmentação frequente do foco. Ferramentas, notificações ou reuniões sem pauta podem ser recorrentes.","A avaliação aponta possível ambiente operacional crítico. A concentração pode estar comprometida pelas condições de trabalho."]
+};
+var scores={};var radarInstance=null;
+function scoreColor(n){if(n<=2)return{bar:"#639922",text:"#3B6D11"};if(n<=4)return{bar:"#EF9F27",text:"#854F0B"};if(n<=6)return{bar:"#D85A30",text:"#993C1D"};return{bar:"#A32D2D",text:"#791F1F"};}
+function selectedBg(n){if(n<=2)return"#639922";if(n<=4)return"#EF9F27";if(n<=6)return"#D85A30";return"#A32D2D";}
+function dimText(id,n){var t=DIM_TEXTS[id];if(n<=2)return t[0];if(n<=4)return t[1];if(n<=6)return t[2];return t[3];}
+function nivelInfo(pct){if(pct<=25)return{label:"Saudável",bg:"#EAF3DE",color:"#27500A",marker:"#639922"};if(pct<=45)return{label:"Atenção",bg:"#FAEEDA",color:"#633806",marker:"#EF9F27"};if(pct<=65)return{label:"Moderado",bg:"#FAEEDA",color:"#854F0B",marker:"#D85A30"};return{label:"Crítico",bg:"#FCEBEB",color:"#791F1F",marker:"#A32D2D"};}
+function fatorTamanho(n){if(n<=3)return 0.9;if(n<=7)return 1.0;if(n<=15)return 1.1;return 1.2;}
+function validEmail(e){return/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
+function buildCats(){
+  var el=document.getElementById("categorias");
+  CATS.forEach(function(cat){
+    var block=document.createElement("div");block.className="cat-block";
+    var btns="";for(var i=0;i<=10;i++)btns+='<button class="sbtn" id="btn-'+cat.id+'-'+i+'" data-cat="'+cat.id+'" data-val="'+i+'">'+i+'</button>';
+    block.innerHTML='<div class="cat-name">'+cat.name+'</div><div class="cat-desc">'+cat.desc+'</div><div class="scale-row">'+btns+'</div><div class="scale-labels"><span>0 — sem atrito</span><span>10 — atrito máximo</span></div>';
+    el.appendChild(block);
+  });
+  document.getElementById("categorias").addEventListener("click",function(e){
+    var btn=e.target.closest(".sbtn");if(!btn)return;
+    var catId=btn.getAttribute("data-cat");var val=parseInt(btn.getAttribute("data-val"));
+    scores[catId]=val;var bg=selectedBg(val);
+    for(var i=0;i<=10;i++){var b=document.getElementById("btn-"+catId+"-"+i);if(b){b.style.background="";b.style.borderColor="";b.style.color="";b.style.fontWeight="";}}
+    btn.style.background=bg;btn.style.borderColor=bg;btn.style.color="#fff";btn.style.fontWeight="500";
+  });
+}
+document.getElementById("horas-atrito").addEventListener("input",function(){document.getElementById("horas-atrito-val").textContent=this.value+"h";});
+function drawRadar(arr){
+  if(radarInstance){radarInstance.destroy();}
+  var ctx=document.getElementById("radarChart").getContext("2d");
+  radarInstance=new Chart(ctx,{type:"radar",data:{labels:["Comunicação","Processo","Decisão","Relacional","Operacional"],datasets:[{data:arr,backgroundColor:"rgba(12,68,124,0.1)",borderColor:"#185FA5",borderWidth:2,pointBackgroundColor:"#0C447C",pointRadius:4}]},options:{responsive:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:10,ticks:{stepSize:2,font:{size:10},color:"#888780",backdropColor:"transparent"},grid:{color:"rgba(181,212,244,0.5)"},angleLines:{color:"rgba(181,212,244,0.5)"},pointLabels:{font:{size:12},color:"#042C53"}}}}});
+}
+document.getElementById("btn-calc").addEventListener("click",function(){
+  var nome=document.getElementById("lead-nome").value.trim();
+  var email=document.getElementById("lead-email").value.trim();
+  var teamName=document.getElementById("team-name").value.trim()||"Time";
+  var nPessoas=parseInt(document.getElementById("n-pessoas").value);
+  var horasSemana=parseInt(document.getElementById("horas-semana").value);
+  var horasAtrito=parseInt(document.getElementById("horas-atrito").value);
+  var allScored=CATS.every(function(c){return scores[c.id]!==undefined;});
+  var valMsg=document.getElementById("val-msg");
+  if(!nome||!email||!validEmail(email)||!nPessoas||!horasSemana||!allScored){
+    valMsg.style.display="block";
+    valMsg.textContent=(!nome||!email||!validEmail(email))?"Preencha seu nome e um e-mail válido para continuar.":"Preencha todos os campos e selecione uma nota para cada categoria antes de continuar.";
+    return;
+  }
+  valMsg.style.display="none";
+  var media=CATS.reduce(function(s,c){return s+scores[c.id];},0)/CATS.length;
+  var fator=fatorTamanho(nPessoas);
+  var criticas=CATS.filter(function(c){return scores[c.id]>=8;});
+  var pen=Math.min(criticas.length,2)*10;
+  var pct=Math.min(Math.round((media/10)*fator*100+pen),100);
+  var capacidade=nPessoas*horasSemana;
+  var nivel=nivelInfo(pct);
+  document.getElementById("r-team").textContent="Diagnóstico · "+teamName;
+  document.getElementById("r-pct").textContent=pct+"%";
+  var badge=document.getElementById("r-badge");badge.textContent=nivel.label;badge.style.background=nivel.bg;badge.style.color=nivel.color;
+  document.getElementById("r-cap").textContent=capacidade+"h";
+  document.getElementById("r-hatrito").textContent=horasAtrito+"h";
+  document.getElementById("r-pessoas").textContent=nPessoas+"p";
+  document.getElementById("r-marker").style.left=pct+"%";
+  var catsEl=document.getElementById("r-cats");catsEl.innerHTML="";
+  CATS.forEach(function(cat){
+    var n=scores[cat.id];var c=scoreColor(n);
+    var row=document.createElement("div");row.className="cr-row";
+    row.innerHTML='<div class="crn">'+cat.name+'</div><div class="crb"><div class="crb-fill" style="width:'+(n*10)+'%;background:'+c.bar+'"></div></div><div class="crs" style="color:'+c.text+'">'+n+'</div>'+(n>=8?'<span class="crit-pill">crítico</span>':'');
+    catsEl.appendChild(row);
+  });
+  var pctHoras=capacidade>0?((horasAtrito/capacidade)*100).toFixed(1):"0.0";
+  document.getElementById("r-hnote").innerHTML='As <strong>'+horasAtrito+'h semanais</strong> em atrito representam <strong>'+pctHoras+'%</strong> da capacidade total de <strong>'+capacidade+'h</strong> do time.';
+  setTimeout(function(){drawRadar(CATS.map(function(c){return scores[c.id];}));},100);
+  var sorted=CATS.slice().sort(function(a,b){return scores[b.id]-scores[a.id];});
+  var dimsEl=document.getElementById("r-dims");dimsEl.innerHTML="";
+  sorted.forEach(function(cat,i){
+    var n=scores[cat.id];var c=scoreColor(n);
+    var block=document.createElement("div");block.className="dim-block";
+    block.innerHTML='<div class="dim-header"><span class="dim-rank">'+(i+1)+'.</span><span class="dim-name">'+cat.name+'</span><span class="dim-score" style="color:'+c.text+'">'+n+'/10</span>'+(n>=8?'<span class="crit-pill">crítico</span>':'')+'</div><div class="dim-text">'+dimText(cat.id,n)+'</div>';
+    dimsEl.appendChild(block);
+  });
+  var waMsg=encodeURIComponent("Olá! Meu nome é "+nome+". Acabei de fazer o diagnóstico de atrito operacional e gostaria de conversar sobre os resultados. Time: "+teamName+" | Atrito: "+pct+"% ("+nivel.label+")");
+  document.getElementById("wa-link").href="https://wa.me/555139078167?text="+waMsg;
+  document.getElementById("form-section").style.display="none";
+  document.getElementById("result-section").style.display="block";
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+document.getElementById("btn-ref").addEventListener("click",function(){
+  document.getElementById("result-section").style.display="none";
+  document.getElementById("form-section").style.display="block";
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+buildCats();
+</script>
+</body>
+</html>
