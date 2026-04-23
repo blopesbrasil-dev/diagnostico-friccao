@@ -306,6 +306,7 @@ document.getElementById("btn-calc").addEventListener("click",function(){
   });
   var waMsg=encodeURIComponent("Olá! Meu nome é "+nome+". Acabei de fazer o diagnóstico de atrito operacional e gostaria de conversar sobre os resultados. Time: "+teamName+" | Atrito: "+pct+"% ("+nivel.label+")");
   document.getElementById("wa-link").href="https://wa.me/555139078167?text="+waMsg;
+  fetch("https://hook.us2.make.com/j44dlsdlxbpnq9eob69ftu1q18tx92dy",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nome:nome,email:email,time:teamName,pessoas:nPessoas,horas_semana:horasSemana,horas_atrito:horasAtrito,score_comunicacao:scores["comunicacao"],score_processo:scores["processo"],score_decisao:scores["decisao"],score_relacional:scores["relacional"],score_operacional:scores["operacional"],friccao_total_pct:pct,nivel_alerta:nivel.label})}).catch(function(){});
   document.getElementById("form-section").style.display="none";
   document.getElementById("result-section").style.display="block";
   window.scrollTo({top:0,behavior:"smooth"});
