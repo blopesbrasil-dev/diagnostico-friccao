@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diagnóstico de Atrito Operacional</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ESD94WYG2X"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ESD94WYG2X');
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -99,12 +107,12 @@ body{background:#f5f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',
   <div id="form-section">
     <div class="page-header">
       <h1>Diagnóstico de atrito operacional</h1>
-      <p>Responda as perguntas abaixo com base na sua percepção sobre o time. O resultado é gerado ao final.</p>
+      <p>Este diagnóstico explora as 5 dimensões de atrito operacional que podem estar comprometendo o desempenho do seu time. Responda com base na sua percepção e veja o resultado ao final.</p>
     </div>
 
     <div class="card-lead">
       <div class="card-lead-title">Antes de começar</div>
-      <div class="card-lead-sub">Preencha seus dados para receber o resultado e, se quiser, conversar sobre ele.</div>
+      <div class="card-lead-sub">Preencha seus dados para receber o resultado.</div>
       <div class="field-row-2">
         <div class="field"><label>Nome <span>*</span></label><input class="finput-lead" type="text" id="lead-nome" placeholder="Seu nome completo"></div>
         <div class="field"><label>E-mail <span>*</span></label><input class="finput-lead" type="email" id="lead-email" placeholder="seu@email.com"></div>
@@ -298,28 +306,6 @@ document.getElementById("btn-calc").addEventListener("click",function(){
   });
   var waMsg=encodeURIComponent("Olá! Meu nome é "+nome+". Acabei de fazer o diagnóstico de atrito operacional e gostaria de conversar sobre os resultados. Time: "+teamName+" | Atrito: "+pct+"% ("+nivel.label+")");
   document.getElementById("wa-link").href="https://wa.me/555139078167?text="+waMsg;
-
-  var payload={
-    nome: nome,
-    email: email,
-    time: teamName,
-    pessoas: nPessoas,
-    horas_semana: horasSemana,
-    horas_atrito: horasAtrito,
-    score_comunicacao: scores["comunicacao"],
-    score_processo: scores["processo"],
-    score_decisao: scores["decisao"],
-    score_relacional: scores["relacional"],
-    score_operacional: scores["operacional"],
-    friccao_total_pct: pct,
-    nivel_alerta: nivel.label
-  };
-  fetch("https://hook.us2.make.com/j44dlsdlxbpnq9eob69ftu1q18tx92dy",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(payload)
-  }).catch(function(){});
-
   document.getElementById("form-section").style.display="none";
   document.getElementById("result-section").style.display="block";
   window.scrollTo({top:0,behavior:"smooth"});
